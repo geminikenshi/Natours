@@ -1,10 +1,25 @@
 import express from 'express';
 import fs from 'fs';
 import path from 'path';
+import morgan from 'morgan';
 
 const app = express();
 
+//
+// Middleware
+app.use(morgan('dev'));
 app.use(express.json());
+
+// Self defined middleware
+app.use((req, res, next) => {
+  console.log('Hello from the middleware 🙂');
+  next();
+});
+
+app.use((req, res, next) => {
+  req.requestTime = new Date().toISOString();
+  next();
+});
 
 app.get('/', (req, res) => {
   res.status(200).json({ message: 'Hello from the server!', app: 'Natours' });
@@ -20,10 +35,16 @@ const tours = JSON.parse(
   fs.readFileSync(`${__dirname.slice(1)}/dev-data/data/tours-simple.json`)
 );
 
+//
+// Route handler
+
 const getAllTours = (req, res) => {
-  res
-    .status(200)
-    .json({ status: 'success', result: tours.length, data: { tours } });
+  res.status(200).json({
+    status: 'success',
+    requestedAt: req.requestTime,
+    result: tours.length,
+    data: { tours },
+  });
 };
 
 const getTour = (req, res) => {
@@ -90,6 +111,9 @@ const deleteTour = (req, res) => {
   });
 };
 
+//
+// Route
+
 // app.get('/api/v1/tours', getAllTours);
 // app.post('/api/v1/tours', createTour);
 // app.get('/api/v1/tours/:id', getTour);
@@ -97,12 +121,14 @@ const deleteTour = (req, res) => {
 // app.delete('/api/v1/tours/:id', deleteTour);
 
 app.route('/api/v1/tours').get(getAllTours).post(createTour);
+
 app
   .route('/api/v1/tours/:id')
   .get(getTour)
   .patch(updateTour)
   .delete(deleteTour);
 
+// Start server
 const port = 3000;
 app.listen(port, () => {
   console.log(`App running on port ${port}...`);
