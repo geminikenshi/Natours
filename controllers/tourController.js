@@ -7,6 +7,16 @@ const tours = JSON.parse(
   fs.readFileSync(`${__dirname.slice(1)}/../dev-data/data/tours-simple.json`)
 );
 
+const checkBody = (req, res, next) => {
+  if (!req.body.name || !req.body.price) {
+    return res
+      .status(400)
+      .json({ status: 'fail', message: 'Request missing required field' });
+  }
+  next();
+};
+
+// parameter middleware
 const checkID = (req, res, next, val) => {
   console.log(`Tour id is ${val}`);
   if (val >= tours.length) {
@@ -69,4 +79,12 @@ const deleteTour = (req, res) => {
   });
 };
 
-export { getAllTours, getTour, createTour, updateTour, deleteTour, checkID };
+export {
+  getAllTours,
+  getTour,
+  createTour,
+  updateTour,
+  deleteTour,
+  checkID,
+  checkBody,
+};
