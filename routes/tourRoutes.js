@@ -8,6 +8,7 @@ tourRouter
   .route('/')
   .get(tourController.getAllTours)
   .post(tourController.checkBody, tourController.createTour);
+
 tourRouter
   .route('/:id')
   .get(tourController.getTour)

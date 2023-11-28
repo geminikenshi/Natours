@@ -8,7 +8,13 @@ const app = express();
 
 //
 // Middleware
-app.use(morgan('dev'));
+
+// Logger
+if (process.env.NODE_ENV === 'development') {
+  app.use(morgan('dev'));
+}
+
+// Request body parser
 app.use(express.json());
 
 // Self defined middleware
